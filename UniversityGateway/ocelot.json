@@ -5,8 +5,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5074
+          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/gateway/mobile/tuition/{studentNumber}",
@@ -24,8 +24,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5074
+          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/gateway/bank/tuition/{studentNumber}",
@@ -36,8 +36,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5074
+          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/gateway/auth/token",
