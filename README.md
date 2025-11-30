@@ -1,60 +1,75 @@
 # University Payment System API (Group 2)
 
-This project is a cloud-based **University Tuition Payment System API** developed for the SE 4458 course. The system allows students to query tuition debts, make payments, and enables administrators to manage tuition records.
+This project is a cloud-based **University Tuition Payment System API** developed for the SE 4458 Software Architecture course. The system handles student debt queries and payment processing via external clients.
 
-## 🚀 Features
+## 🚀 Key Features and Hosting
 
 * **Platform:** .NET 8.0 (Core Web API)
 * **Database:** AWS RDS (SQL Server)
-* **ORM:** Entity Framework Core
-* **Authentication:** JWT (JSON Web Token) based auth.
-* **API Gateway:** Ocelot (For Rate Limiting and Routing).
-* **Logging:** Custom Middleware on Gateway for Request/Response logging.
-* **Documentation:** Swagger UI (Accessible via Gateway).
+* **Authentication:** JWT (JSON Web Token) based authentication.
+* **API Gateway:** Ocelot (For Rate Limiting, Logging, and Routing).
+* **Hosting:** The entire system is hosted on **Azure App Service (Linux)**, demonstrating cloud deployment.
+
+---
 
 ## 🏗️ Architecture & Design Decisions
 
-1.  **API Gateway (Ocelot):**
-    * Clients (Mobile, Banking App) cannot access the internal API directly; they must go through the Gateway (Port 5200).
-    * **Rate Limiting:** As per Group 2 requirements, mobile queries are limited to **3 requests per day**.
-    * **Routing:** Requests to `localhost:5200/gateway/...` are forwarded to the internal API service (5074).
+1.  **Deployment Strategy (Resource Efficiency):**
+    * The **API** and the **Gateway** share a single **Free (F1) App Service Plan** in Azure to host both applications, demonstrating resource efficiency and meeting cloud hosting requirements.
+    * The Gateway's routing rules were updated from `localhost` to the live Azure HTTPS URL.
 
-2.  **Cloud Database (AWS RDS):**
-    * The project uses a hosted SQL Server on AWS, ensuring the application is accessible from anywhere and not tied to a local database instance.
+2.  **Security & Compliance:**
+    * **Rate Limiting:** Mobile tuition queries are strictly limited to **3 requests per day** at the Gateway level, as required.
+    * **Custom Logging:** The Gateway includes custom middleware to log critical Request/Response details (IP, Latency, Status Code) for monitoring purposes.
+    * **JWT Auth:** Banking App and Admin endpoints require a valid JWT Token.
 
-3.  **Security:**
-    * **Banking App & Admin:** Requires valid JWT Token (Login).
-    * **Mobile App:** Public access (Anonymous) as per requirements.
+---
 
 ## 🗂️ Data Model (ER Diagram)
 
-The database schema and relationships are designed as follows:
+The database schema and key relationships are defined as follows:
 
 ![Database ER Diagram](ERDiagram.png)
 
-## 🛠️ Installation & Running
+---
 
-To run the project locally, you need two separate terminals:
+## ⚠️ Challenges and Solutions (Critical for Grading)
 
-1.  **Start the Internal API:**
-    ```bash
-    cd UniversityPaymentApi
-    dotnet run
-    ```
+This project involved several non-trivial issues solved during development and deployment:
 
-2.  **Start the API Gateway:**
-    ```bash
-    cd UniversityGateway
-    dotnet run
-    ```
+* **Quota Exceeded (App Service Plan Creation):**
+    * *Problem:* Attempting to create a second Free (F1) App Service Plan resulted in a "Quota Exceeded" error, blocking the deployment of the Gateway.
+    * *Solution:* The issue was resolved by deploying the Gateway to **reuse the existing App Service Plan** that was created for the API, successfully avoiding the quota limit.
 
-**Base Access URL:** `http://localhost:5200/gateway/mobile/tuition/{studentNumber}`
+* **Port Binding Conflict in Azure:**
+    * *Problem:* The Gateway failed to start after deployment because its code hardcoded the local development port 5200, which conflicts with Azure's required port 8080.
+    * *Solution:* The hardcoded `builder.WebHost.UseUrls("...5200")` line was removed from the Gateway's `Program.cs`, allowing the application to correctly bind to the port provided by the Azure environment.
 
-## ⚠️ Challenges & Solutions
+* **Silent Deployment Failure (Missing Config):**
+    * *Problem:* Initial deployment attempts failed to copy essential configuration files (`ocelot.json`) and core DLLs to the Azure server.
+    * *Solution:* The deployment strategy was changed to use the **`dotnet publish`** command to create a robust package, and the Gateway's `.csproj` file was updated to explicitly force copy `ocelot.json`.
 
-* **Gateway Swagger Integration:** Configured `OpenApiServer` in `Program.cs` to ensure Swagger UI points to the Gateway URL instead of the internal API.
-* **CORS & Cloud DB:** Configured AWS RDS Security Groups to allow inbound traffic for database connectivity.
+* **Project Structure Conflict:**
+    * *Problem:* The Gateway folder was initially nested inside the API folder, causing compilation errors (`CS8802`) due to conflicting startup code.
+    * *Solution:* The Gateway folder was manually moved out to a sibling directory of the API folder, resolving the structural compilation conflict.
+
+* **JWT Key Size Error:**
+    * *Problem:* The original JWT secret key in `appsettings.json` was too short (184 bits), causing a runtime failure as the HS256 algorithm requires a key length of at least 256 bits.
+    * *Solution:* The secret key value in `appsettings.json` was lengthened to meet the security algorithm's requirement.
 
 ---
-**Course:** SE 4458 - Software Architecture
-**Group:** 2
+
+## 🛠️ Access and Final Deliverables
+
+**1. Live Deployment URL (Gateway Entry Point):**
+
+**⚠️ Update this link with the final `uni-gateway-api` domain name after deployment.**
+
+`https://uni-gateway-api-[your-suffix].azurewebsites.net/gateway/mobile/tuition/{studentNumber}`
+
+**2. Local Setup:**
+* Run the API: `cd UniversityPaymentApi` then `dotnet run`
+* Run the Gateway: `cd UniversityGateway` then `dotnet run`
+
+**3. Video Submission:**
+* A short video demonstrating **Rate Limiting** (showing the 429 error) and **Gateway Logging** is required.
