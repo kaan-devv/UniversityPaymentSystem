@@ -81,6 +81,8 @@ The following features are functional and verifiable on the live Azure deploymen
 
 `https://uni-gateway-api-[your-suffix].azurewebsites.net/gateway/mobile/tuition/{studentNumber}`
 
+**Swagger UI Adress (Live):** `https://uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net/swagger/index.html`
+
 **2. Local Setup:**
 * Run the API: `cd UniversityPaymentApi` then `dotnet run`
 * Run the Gateway: `cd UniversityGateway` then `dotnet run`
