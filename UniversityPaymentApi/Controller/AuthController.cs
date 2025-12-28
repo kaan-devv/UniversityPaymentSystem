@@ -1,9 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using UniversityPaymentApi.Dtos;
 
 namespace UniversityPaymentApi.Controllers;
@@ -14,63 +13,50 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
 
-    private readonly Dictionary<string, (string Password, string Role)> _users =
-        new(StringComparer.OrdinalIgnoreCase)
-        {
-            { "admin", ("Admin123!", "Admin") },
-            { "bankuser", ("Bank123!", "Bank") }
-        };
-
     public AuthController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
     [HttpPost("token")]
-    [AllowAnonymous]
-    public ActionResult<TokenResponseDto> GetToken([FromBody] LoginRequestDto request)
+    public IActionResult Login([FromBody] LoginDto request)
     {
-        if (!_users.TryGetValue(request.Username, out var userInfo) ||
-            userInfo.Password != request.Password)
+        if (request.Username == "admin" && request.Password == "12345") 
         {
-            return Unauthorized(new TokenResponseDto
-            {
-                Success = false,
-                Message = "Invalid username or password."
-            });
+            var tokenString = GenerateJwtToken(request.Username);
+            return Ok(new { token = tokenString });
         }
 
-        var role = userInfo.Role;
+        return Unauthorized(new { message = "Invalid credentials" });
+    }
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
-        );
+    private string GenerateJwtToken(string username)
+    {
+        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "VarsayilanUzunGizliAnahtar123!");
+        var issuer = _configuration["Jwt:Issuer"];
+        var audience = _configuration["Jwt:Audience"];
 
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new List<Claim>
+        var claims = new[]
         {
-            new Claim(ClaimTypes.Name, request.Username),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, "Admin")
         };
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: issuer,
+            audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
-            signingCredentials: creds
+            expires: DateTime.UtcNow.AddHours(2), 
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         );
 
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return Ok(new TokenResponseDto
-        {
-            Success = true,
-            Message = "Token generated.",
-            Token = tokenString,
-            ExpiresAt = token.ValidTo,
-            Role = role
-        });
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
+}
+
+public class LoginDto
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
 }

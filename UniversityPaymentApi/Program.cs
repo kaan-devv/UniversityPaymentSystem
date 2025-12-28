@@ -1,20 +1,33 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using UniversityPaymentApi;
+// using Microsoft.EntityFrameworkCore; // SQL kalktığı için buna gerek kalmadı
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddDbContext<UniversityContext>(opt =>
+// 1. CORS Ayarı (Tarayıcıdan erişim izni)
+builder.Services.AddCors(options =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
 });
+
+// 2. Firestore Anahtar Dosyası Yolu
+string path = Path.Combine(Directory.GetCurrentDirectory(), "serviceAccountKey.json");
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
+
+// DİKKAT: SQL Bağlantı kodunu sildim. Artık Firestore kullanıyoruz.
 
 builder.Services.AddControllers();
 
+// 3. Swagger Ayarları
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -24,13 +37,9 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1"
     });
 
-    c.AddServer(new OpenApiServer 
-    { 
-        Url = "http://localhost:5200", 
-        Description = "API Gateway (Tüm İstekler Buradan)" 
-    });
-
-
+    // Port sabitlemeyi kaldırdık, otomatik algılasın diye.
+    
+    // JWT için kilit simgesi ekleme
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme.",
@@ -53,7 +62,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// JWT Authentication
+// 4. JWT Authentication Ayarları
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -71,25 +80,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// CORS
-builder.Services.AddCors(p => p.AddPolicy("corsapp", policy =>
-{
-    policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-}));
-
 var app = builder.Build();
 
-
+// 5. Middleware Sıralaması
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
-// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("corsapp");
+// CORS
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

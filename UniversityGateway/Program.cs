@@ -11,23 +11,33 @@ var app = builder.Build();
 
 app.Use(async (context, next) =>
 {
-    Console.WriteLine($"\n--- [İSTEK BAŞLADI] ---");
+    var requestTime = DateTime.UtcNow;
     var watch = Stopwatch.StartNew();
-    
+
+    var remoteIp = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+    var headers = string.Join("; ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}"));
+    var requestSize = context.Request.ContentLength ?? 0;
+
     Console.ForegroundColor = ConsoleColor.Cyan;
-    Console.WriteLine($"GELEN: {context.Request.Method} {context.Request.Path}");
+    Console.WriteLine($"\n--- [NEW REQUEST] {requestTime} ---");
+    Console.WriteLine($"IP: {remoteIp} | Size: {requestSize} bytes");
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
+    Console.WriteLine($"Headers: {headers}");
     Console.ResetColor();
 
     await next();
 
     watch.Stop();
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"BİTTİ: Status {context.Response.StatusCode} | {watch.ElapsedMilliseconds}ms");
+    var statusCode = context.Response.StatusCode;
+    var authStatus = (statusCode == 401 || statusCode == 403) ? "FAILED" : "SUCCESS";
+
+    Console.ForegroundColor = statusCode >= 400 ? ConsoleColor.Red : ConsoleColor.Green;
+    Console.WriteLine($"[RESPONSE] Status: {statusCode} | Auth: {authStatus} | Duration: {watch.ElapsedMilliseconds}ms");
     Console.ResetColor();
-    Console.WriteLine($"--- [İSTEK BİTTİ] ---\n");
+    Console.WriteLine("----------------------------------\n");
 });
 
-app.MapGet("/", () => "University Gateway Calisiyor! 🚀");
+app.MapGet("/", () => "University Gateway is Running! 🚀");
 
 await app.UseOcelot();
 

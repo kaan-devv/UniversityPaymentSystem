@@ -5,46 +5,39 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5074
         }
       ],
-      "UpstreamPathTemplate": "/gateway/mobile/tuition/{studentNumber}",
-      "UpstreamHttpMethod": [ "Get" ],
-      "RateLimitOptions": {
-        "ClientWhitelist": [],
-        "EnableRateLimiting": true,
-        "Period": "1d",
-        "PeriodTimespan": 86400,
-        "Limit": 3
-      }
+      "UpstreamPathTemplate": "/api/tuition/{studentNumber}",
+      "UpstreamHttpMethod": [ "GET" ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/Student/bank/tuition/{studentNumber}",
+      "DownstreamPathTemplate": "/api/v1/Admin/tuition",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5074
         }
       ],
-      "UpstreamPathTemplate": "/gateway/bank/tuition/{studentNumber}",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamPathTemplate": "/api/admin/tuition",
+      "UpstreamHttpMethod": [ "POST" ]
     },
     {
-      "DownstreamPathTemplate": "/api/v1/Auth/token",
+      "DownstreamPathTemplate": "/api/v1/Payment/pay",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "uni-payment-api-decgg9f8bhdtgfd8.westeurope-01.azurewebsites.net",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 5074
         }
       ],
-      "UpstreamPathTemplate": "/gateway/auth/token",
-      "UpstreamHttpMethod": [ "Post" ]
+      "UpstreamPathTemplate": "/api/payment",
+      "UpstreamHttpMethod": [ "POST" ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5200"
+    "BaseUrl": "http://localhost:5088"
   }
 }

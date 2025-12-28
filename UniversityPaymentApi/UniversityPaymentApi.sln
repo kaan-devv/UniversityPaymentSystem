@@ -4,7 +4,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversityPaymentApi", "UniversityPaymentApi.csproj", "{0A529BBF-716D-4B77-34AB-0A618A0F0954}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversityGateway", "UniversityGateway\UniversityGateway.csproj", "{22FC119D-4843-4FE3-A8BA-2A6F91C5177F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversityGateway", "..\UniversityGateway\UniversityGateway.csproj", "{D9477B19-22FD-4030-BCFD-DA15E70D71BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +16,10 @@ Global
 		{0A529BBF-716D-4B77-34AB-0A618A0F0954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A529BBF-716D-4B77-34AB-0A618A0F0954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A529BBF-716D-4B77-34AB-0A618A0F0954}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22FC119D-4843-4FE3-A8BA-2A6F91C5177F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22FC119D-4843-4FE3-A8BA-2A6F91C5177F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22FC119D-4843-4FE3-A8BA-2A6F91C5177F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{22FC119D-4843-4FE3-A8BA-2A6F91C5177F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9477B19-22FD-4030-BCFD-DA15E70D71BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9477B19-22FD-4030-BCFD-DA15E70D71BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9477B19-22FD-4030-BCFD-DA15E70D71BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9477B19-22FD-4030-BCFD-DA15E70D71BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
